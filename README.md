@@ -1,6 +1,11 @@
 # Link-OS Xamarin Sample Code 
 C# .NET based sample code for developing printing and encoding apps on Android, iOS and Xamarin Forms apps. The demos in this repository are stored on separate branches. To navigate to a demo, please click branches.
 
+Projects contained in this repository:
+
+[ZSDK DevDemos](https://github.com/Zebra/LinkOS-Xamarin-Samples/tree/ZSDK_DevDemos) 
+
+
 # Notes
 All printer sample code is selectable from the branches on this repository.
 
