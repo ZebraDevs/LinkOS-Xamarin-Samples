@@ -1,0 +1,98 @@
+﻿<!--
+ /***********************************************
+ * CONFIDENTIAL AND PROPRIETARY 
+ * 
+ * The source code and other information contained herein is the confidential and exclusive property of
+ * ZIH Corp. and is subject to the terms and conditions in your end user license agreement.
+ * This source code, and any other information contained herein, shall not be copied, reproduced, published, 
+ * displayed or distributed, in whole or in part, in any medium, by any means, for any purpose except as
+ * expressly permitted under such license agreement.
+ * 
+ * Copyright ZIH Corp. 2018
+ * 
+ * ALL RIGHTS RESERVED
+ ***********************************************/
+-->
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:XamarinPrintStation"
+             x:Class="XamarinPrintStation.SelectPrinterPage"
+             Title="Select a Printer">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter" />
+            <local:DiscoveredPrinterToConnectionTypeImageConverter x:Key="DiscoveredPrinterToConnectionTypeImageConverter" />
+            <local:DiscoveredPrinterToFriendlyNameConverter x:Key="DiscoveredPrinterToFriendlyNameConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <Grid BackgroundColor="{x:Static local:ZebraColor.DefaultBackgroundColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="10" BackgroundColor="White">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackLayout Grid.Row="0" Orientation="Horizontal" HeightRequest="42">
+                    <Label Margin="15,0" VerticalOptions="Center" HorizontalOptions="StartAndExpand" Text="Discovered Printers" Style="{StaticResource HeadingStyle}" />
+                    <Image x:Name="RefreshIcon" Margin="5,0" Source="ic_refresh.png" VerticalOptions="Center">
+                        <Image.Triggers>
+                            <DataTrigger TargetType="Image" Binding="{Binding IsPrinterListRefreshing}" Value="True">
+                                <Setter Property="Opacity" Value="0.25" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Image" Binding="{Binding IsSelectingPrinter}" Value="True">
+                                <Setter Property="Opacity" Value="0.25" />
+                            </DataTrigger>
+                        </Image.Triggers>
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="RefreshIcon_Tapped" />
+                        </Image.GestureRecognizers>
+                    </Image>
+                </StackLayout>
+                <StackLayout Grid.Row="1" BackgroundColor="{x:Static local:ZebraColor.ZebraBlue}" HeightRequest="2" HorizontalOptions="FillAndExpand" />
+                <ListView x:Name="PrinterList" Grid.Row="2" ItemsSource="{Binding DiscoveredPrinterList}" SelectedItem="{Binding HighlightedPrinter}" HasUnevenRows="True">
+                    <ListView.Triggers>
+                        <DataTrigger TargetType="ListView" Binding="{Binding IsSelectingPrinter}" Value="True">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                    </ListView.Triggers>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <StackLayout Orientation="Horizontal" Padding="0,5">
+                                    <Image Source="{Binding ., Converter={StaticResource DiscoveredPrinterToConnectionTypeImageConverter}}" VerticalOptions="Center" Margin="10,0,5,0" />
+                                    <StackLayout Spacing="1" Orientation="Vertical" VerticalOptions="Center" HorizontalOptions="FillAndExpand">
+                                        <Label Text="{Binding ., Converter={StaticResource DiscoveredPrinterToFriendlyNameConverter}}" HorizontalOptions="FillAndExpand" Style="{StaticResource PrinterFriendlyNameStyle}" />
+                                        <Label Text="{Binding Address}" HorizontalOptions="FillAndExpand" Style="{StaticResource PrinterAddressStyle}" />
+                                    </StackLayout>
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Grid Grid.Row="2" BackgroundColor="White" IsVisible="{Binding IsSelectingPrinter}">
+                    <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
+                        <ActivityIndicator IsRunning="{Binding IsSelectingPrinter}" />
+                        <Label Margin="0,5,0,0" Text="Selecting printer..." Style="{StaticResource ProgressMessageStyle}" />
+                    </StackLayout>
+                </Grid>
+            </Grid>
+            <Button Grid.Row="1" Text="Select" IsEnabled="False" Clicked="SelectButton_Clicked">
+                <Button.Triggers>
+                    <MultiTrigger TargetType="Button">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding IsSelectingPrinter}" Value="False" />
+                            <BindingCondition Binding="{Binding HighlightedPrinter, Converter={StaticResource NotNullToBooleanConverter}}" Value="True" />
+                        </MultiTrigger.Conditions>
+                        <Setter Property="IsEnabled" Value="True" />
+                    </MultiTrigger>
+                </Button.Triggers>
+            </Button>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

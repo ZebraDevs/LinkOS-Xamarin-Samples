@@ -1,0 +1,113 @@
+﻿<!--
+ /***********************************************
+ * CONFIDENTIAL AND PROPRIETARY 
+ * 
+ * The source code and other information contained herein is the confidential and exclusive property of
+ * ZIH Corp. and is subject to the terms and conditions in your end user license agreement.
+ * This source code, and any other information contained herein, shall not be copied, reproduced, published, 
+ * displayed or distributed, in whole or in part, in any medium, by any means, for any purpose except as
+ * expressly permitted under such license agreement.
+ * 
+ * Copyright ZIH Corp. 2018
+ * 
+ * ALL RIGHTS RESERVED
+ ***********************************************/
+-->
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:XamarinPrintStation"
+             x:Class="XamarinPrintStation.PrintFormatPage"
+             Title="Print a Format">
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:ListEmptyConverter x:Key="ListEmptyConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <ContentPage.Content>
+        <Grid BackgroundColor="{x:Static local:ZebraColor.DefaultBackgroundColor}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Margin="10" BackgroundColor="White">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackLayout Grid.Row="0" Orientation="Horizontal" HeightRequest="42">
+                    <Label Margin="15,0" VerticalOptions="Center" HorizontalOptions="StartAndExpand" Text="Variable Fields" Style="{StaticResource HeadingStyle}" />
+                </StackLayout>
+                <StackLayout Grid.Row="1" BackgroundColor="{x:Static local:ZebraColor.ZebraBlue}" HeightRequest="2" HorizontalOptions="FillAndExpand" />
+                <ListView x:Name="VariableFieldList" Grid.Row="2" ItemsSource="{Binding FormatVariableList}" SeparatorVisibility="None" HasUnevenRows="True" SelectionMode="None" IsVisible="False">
+                    <ListView.Triggers>
+                        <MultiTrigger TargetType="ListView">
+                            <MultiTrigger.Conditions>
+                                <BindingCondition Binding="{Binding IsVariableFieldListRefreshing}" Value="False" />
+                                <BindingCondition Binding="{Binding IsSendingPrintJob}" Value="False" />
+                                <BindingCondition Binding="{Binding FormatVariableList, Converter={StaticResource ListEmptyConverter}}" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="IsVisible" Value="True" />
+                        </MultiTrigger>
+                    </ListView.Triggers>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <StackLayout Orientation="Vertical" Padding="15,10">
+                                    <Label Margin="0,0,0,3" Text="{Binding Name}" FontSize="12" FontAttributes="Bold" TextColor="{x:Static local:ZebraColor.ZebraBlue}" />
+                                    <Entry Text="{Binding Value}" Placeholder="Enter a value" />
+                                </StackLayout>
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Grid Grid.Row="2" IsVisible="False">
+                    <Grid.Triggers>
+                        <DataTrigger TargetType="Grid" Binding="{Binding IsVariableFieldListRefreshing}" Value="True">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                        <DataTrigger TargetType="Grid" Binding="{Binding IsSendingPrintJob}" Value="True">
+                            <Setter Property="IsVisible" Value="True" />
+                        </DataTrigger>
+                    </Grid.Triggers>
+                    <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
+                        <ActivityIndicator IsRunning="True" />
+                        <Label Margin="0,5,0,0" Style="{StaticResource ProgressMessageStyle}" HorizontalTextAlignment="Center">
+                            <Label.Triggers>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsVariableFieldListRefreshing}" Value="True">
+                                    <Setter Property="Text" Value="Retrieving format variables..." />
+                                </DataTrigger>
+                                <DataTrigger TargetType="Label" Binding="{Binding IsSendingPrintJob}" Value="True">
+                                    <Setter Property="Text" Value="Sending print job..." />
+                                </DataTrigger>
+                            </Label.Triggers>
+                        </Label>
+                    </StackLayout>
+                </Grid>
+                <Label Grid.Row="2" Margin="15,0" Text="No variable fields found" Style="{StaticResource EmptyListMessageStyle}" IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label.Triggers>
+                        <MultiTrigger TargetType="Label">
+                            <MultiTrigger.Conditions>
+                                <BindingCondition Binding="{Binding IsVariableFieldListRefreshing}" Value="False" />
+                                <BindingCondition Binding="{Binding IsSendingPrintJob}" Value="False" />
+                                <BindingCondition Binding="{Binding FormatVariableList, Converter={StaticResource ListEmptyConverter}}" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter Property="IsVisible" Value="True" />
+                        </MultiTrigger>
+                    </Label.Triggers>
+                </Label>
+            </Grid>
+            <Button Grid.Row="1" Text="Print" IsEnabled="True" Clicked="PrintButton_Clicked">
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsVariableFieldListRefreshing}" Value="True">
+                        <Setter Property="IsEnabled" Value="False" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsSendingPrintJob}" Value="True">
+                        <Setter Property="IsEnabled" Value="False" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>

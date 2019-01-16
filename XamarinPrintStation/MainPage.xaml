@@ -1,0 +1,276 @@
+﻿<!--
+ /***********************************************
+ * CONFIDENTIAL AND PROPRIETARY 
+ * 
+ * The source code and other information contained herein is the confidential and exclusive property of
+ * ZIH Corp. and is subject to the terms and conditions in your end user license agreement.
+ * This source code, and any other information contained herein, shall not be copied, reproduced, published, 
+ * displayed or distributed, in whole or in part, in any medium, by any means, for any purpose except as
+ * expressly permitted under such license agreement.
+ * 
+ * Copyright ZIH Corp. 2018
+ * 
+ * ALL RIGHTS RESERVED
+ ***********************************************/
+-->
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:XamarinPrintStation"
+             x:Class="XamarinPrintStation.MainPage"
+             x:Name="MainContentPage"
+             Title="Print Station">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name="BluetoothHelpButton" Clicked="BluetoothHelpButton_Clicked" Icon="ic_bluetooth_help.png">
+            <ToolbarItem.Text>
+                <OnPlatform Android="Bluetooth Help" iOS="Bluetooth Help" WPF="BT Help" />
+            </ToolbarItem.Text>
+        </ToolbarItem>
+        <ToolbarItem Text="About" Clicked="AboutButton_Clicked" Icon="ic_info_white.png" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <local:DiscoveredPrinterToAddressConverter x:Key="DiscoveredPrinterToAddressConverter" />
+            <local:DiscoveredPrinterToConnectionTypeImageConverter x:Key="DiscoveredPrinterToConnectionTypeImageConverter" />
+            <local:DiscoveredPrinterToFriendlyNameConverter x:Key="DiscoveredPrinterToFriendlyNameConverter" />
+            <local:NotNullToBooleanConverter x:Key="NotNullToBooleanConverter" />
+            <local:NullToBooleanConverter x:Key="NullToBooleanConverter" />
+            <local:ListEmptyConverter x:Key="ListEmptyConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    <Grid Padding="10" BackgroundColor="{x:Static local:ZebraColor.DefaultBackgroundColor}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackLayout Grid.Row="0" Orientation="Vertical" BackgroundColor="White" IsVisible="True">
+            <StackLayout.Triggers>
+                <DataTrigger TargetType="StackLayout" Binding="{Binding IsSelectingNfcPrinter}" Value="True">
+                    <Setter Property="IsVisible" Value="False" />
+                </DataTrigger>
+            </StackLayout.Triggers>
+            <StackLayout Orientation="Horizontal" HeightRequest="42">
+                <Label Margin="15,0" VerticalOptions="Center" HorizontalOptions="StartAndExpand" Text="Selected Printer" Style="{StaticResource HeadingStyle}" />
+            </StackLayout>
+            <StackLayout BackgroundColor="{x:Static local:ZebraColor.ZebraBlue}" HeightRequest="2" HorizontalOptions="FillAndExpand" />
+            <StackLayout Margin="10,5" Orientation="Horizontal" IsVisible="{Binding SelectedPrinter, Converter={StaticResource NotNullToBooleanConverter}}">
+                <Image VerticalOptions="Center" Margin="0,0,5,0" Source="{Binding SelectedPrinter, Converter={StaticResource DiscoveredPrinterToConnectionTypeImageConverter}}" />
+                <Grid VerticalOptions="Center" HorizontalOptions="FillAndExpand" RowSpacing="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" LineBreakMode="TailTruncation" Text="{Binding SelectedPrinter, Converter={StaticResource DiscoveredPrinterToFriendlyNameConverter}}" Style="{StaticResource PrinterFriendlyNameStyle}" />
+                    <Label Grid.Row="1" LineBreakMode="TailTruncation" Text="{Binding SelectedPrinter, Converter={StaticResource DiscoveredPrinterToAddressConverter}}" Style="{StaticResource PrinterAddressStyle}" />
+                </Grid>
+            </StackLayout>
+            <Label Margin="15,10" Text="No printer selected" FontSize="14" IsVisible="{Binding SelectedPrinter, Converter={StaticResource NullToBooleanConverter}}" />
+            <Button Text="Select Printer" Clicked="SelectPrinter_Clicked" IsEnabled="False">
+                <Button.Triggers>
+                    <MultiTrigger TargetType="Button">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding IsStoredFormatListRefreshing}" Value="False" />
+                            <BindingCondition Binding="{Binding IsPrinterFormatListRefreshing}" Value="False" />
+                        </MultiTrigger.Conditions>
+                        <Setter Property="IsEnabled" Value="True" />
+                    </MultiTrigger>
+                </Button.Triggers>
+            </Button>
+        </StackLayout>
+        <Grid Grid.Row="1" Margin="0,10,0,0" BackgroundColor="White" IsVisible="{Binding SelectedPrinter, Converter={StaticResource NotNullToBooleanConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackLayout Grid.Row="0" Orientation="Horizontal" HeightRequest="42">
+                <Label Margin="15,0" VerticalOptions="Center" HorizontalOptions="StartAndExpand" Text="Stored Formats" Style="{StaticResource HeadingStyle}" />
+                <Image x:Name="StoredFormatsRefreshIcon" Margin="5,0" Source="ic_refresh.png" VerticalOptions="Center">
+                    <Image.Triggers>
+                        <DataTrigger TargetType="Image" Binding="{Binding IsStoredFormatListRefreshing}" Value="True">
+                            <Setter Property="Opacity" Value="0.25" />
+                        </DataTrigger>
+                    </Image.Triggers>
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="StoredFormatsRefreshIcon_Tapped" />
+                    </Image.GestureRecognizers>
+                </Image>
+            </StackLayout>
+            <StackLayout Grid.Row="1" BackgroundColor="{x:Static local:ZebraColor.ZebraBlue}" HeightRequest="2" HorizontalOptions="FillAndExpand" />
+            <ListView x:Name="StoredFormatList" Grid.Row="2" ItemsSource="{Binding StoredFormatList}" SelectionMode="None" IsVisible="False">
+                <ListView.Triggers>
+                    <MultiTrigger TargetType="ListView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding IsStoredFormatListRefreshing}" Value="False" />
+                            <BindingCondition Binding="{Binding StoredFormatList, Converter={StaticResource ListEmptyConverter}}" Value="False" />
+                        </MultiTrigger.Conditions>
+                        <Setter Property="IsVisible" Value="True" />
+                    </MultiTrigger>
+                </ListView.Triggers>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal" Padding="15,5">
+                                <Label Text="{Binding StoredPath}" VerticalOptions="Center" />
+                                <Image Source="ic_delete.png" Margin="15,0,0,0" VerticalOptions="Center" HorizontalOptions="EndAndExpand" IsVisible="True">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding Source={x:Reference MainContentPage}, Path=BindingContext.IsPrinterFormatListRefreshing}" Value="True">
+                                            <Setter Property="Opacity" Value="0.25" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Image" Binding="{Binding Source={x:Reference MainContentPage}, Path=BindingContext.IsSavingFormat}" Value="True">
+                                            <Setter Property="Opacity" Value="0.25" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Image" Binding="{Binding IsDeleting}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer CommandParameter="{Binding .}" Command="{Binding OnDeleteButtonClicked}" />
+                                    </Image.GestureRecognizers>
+                                </Image>
+                                <ActivityIndicator WidthRequest="24" HeightRequest="24" Margin="15,0,0,0" VerticalOptions="Center" HorizontalOptions="EndAndExpand" IsRunning="{Binding IsDeleting}" IsVisible="{Binding IsDeleting}" />
+                                <Image Source="ic_zebra_printer.png" Margin="15,0,0,0" VerticalOptions="Center" HorizontalOptions="End">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding Source={x:Reference MainContentPage}, Path=BindingContext.IsPrinterFormatListRefreshing}" Value="True">
+                                            <Setter Property="Opacity" Value="0.25" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Image" Binding="{Binding Source={x:Reference MainContentPage}, Path=BindingContext.IsSavingFormat}" Value="True">
+                                            <Setter Property="Opacity" Value="0.25" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer CommandParameter="{Binding .}" Command="{Binding OnPrintButtonClicked}" />
+                                    </Image.GestureRecognizers>
+                                </Image>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Grid Grid.Row="2" BackgroundColor="White" IsVisible="{Binding IsStoredFormatListRefreshing}">
+                <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
+                    <ActivityIndicator IsRunning="{Binding IsStoredFormatListRefreshing}" />
+                    <Label Margin="0,5,0,0" Text="Retrieving stored formats..." Style="{StaticResource ProgressMessageStyle}" />
+                </StackLayout>
+            </Grid>
+            <Label Grid.Row="2" Text="No formats found" Style="{StaticResource EmptyListMessageStyle}" IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center">
+                <Label.Triggers>
+                    <MultiTrigger TargetType="Label">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding IsStoredFormatListRefreshing}" Value="False" />
+                            <BindingCondition Binding="{Binding StoredFormatList, Converter={StaticResource ListEmptyConverter}}" Value="True" />
+                        </MultiTrigger.Conditions>
+                        <Setter Property="IsVisible" Value="True" />
+                    </MultiTrigger>
+                </Label.Triggers>
+            </Label>
+        </Grid>
+        <Grid Grid.Row="2" Margin="0,10,0,0" BackgroundColor="White" IsVisible="{Binding SelectedPrinter, Converter={StaticResource NotNullToBooleanConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackLayout Grid.Row="0" Orientation="Horizontal" HeightRequest="42">
+                <Label Margin="15,0" VerticalOptions="Center" HorizontalOptions="StartAndExpand" Text="Printer Formats" Style="{StaticResource HeadingStyle}" />
+                <Image x:Name="PrinterFormatsRefreshIcon" Margin="5,0" Source="ic_refresh.png" VerticalOptions="Center">
+                    <Image.Triggers>
+                        <DataTrigger TargetType="Image" Binding="{Binding IsPrinterFormatListRefreshing}" Value="True">
+                            <Setter Property="Opacity" Value="0.25" />
+                        </DataTrigger>
+                    </Image.Triggers>
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="PrinterFormatsRefreshIcon_Tapped" />
+                    </Image.GestureRecognizers>
+                </Image>
+            </StackLayout>
+            <StackLayout Grid.Row="1" BackgroundColor="{x:Static local:ZebraColor.ZebraBlue}" HeightRequest="2" HorizontalOptions="FillAndExpand" />
+            <ListView x:Name="PrinterFormatList" Grid.Row="2" ItemsSource="{Binding PrinterFormatList}" SelectionMode="None" IsVisible="False">
+                <ListView.Triggers>
+                    <MultiTrigger TargetType="ListView">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding IsPrinterFormatListRefreshing}" Value="False" />
+                            <BindingCondition Binding="{Binding PrinterFormatList, Converter={StaticResource ListEmptyConverter}}" Value="False" />
+                        </MultiTrigger.Conditions>
+                        <Setter Property="IsVisible" Value="True" />
+                    </MultiTrigger>
+                </ListView.Triggers>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <StackLayout Orientation="Horizontal" Padding="15,5">
+                                <Label Text="{Binding PrinterPath}" VerticalOptions="Center" />
+                                <Image Source="ic_save.png" Margin="15,0,0,0" VerticalOptions="Center" HorizontalOptions="EndAndExpand" IsVisible="True">
+                                    <Image.Triggers>
+                                        <MultiTrigger TargetType="Image">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsSaving}" Value="False" />
+                                                <BindingCondition Binding="{Binding Source={x:Reference MainContentPage}, Path=BindingContext.IsSavingFormat}" Value="True" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Opacity" Value="0.25" />
+                                        </MultiTrigger>
+                                        <MultiTrigger TargetType="Image">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsSaving}" Value="False" />
+                                                <BindingCondition Binding="{Binding Source={x:Reference MainContentPage}, Path=BindingContext.IsDeletingFormat}" Value="True" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Opacity" Value="0.25" />
+                                        </MultiTrigger>
+                                        <MultiTrigger TargetType="Image">
+                                            <MultiTrigger.Conditions>
+                                                <BindingCondition Binding="{Binding IsSaving}" Value="False" />
+                                                <BindingCondition Binding="{Binding Source={x:Reference MainContentPage}, Path=BindingContext.IsStoredFormatListRefreshing}" Value="True" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Opacity" Value="0.25" />
+                                        </MultiTrigger>
+                                        <DataTrigger TargetType="Image" Binding="{Binding IsSaving}" Value="True">
+                                            <Setter Property="IsVisible" Value="False" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer CommandParameter="{Binding .}" Command="{Binding OnSaveButtonClicked}" />
+                                    </Image.GestureRecognizers>
+                                </Image>
+                                <ActivityIndicator WidthRequest="24" HeightRequest="24" Margin="15,0,0,0" VerticalOptions="Center" HorizontalOptions="EndAndExpand" IsRunning="{Binding IsSaving}" IsVisible="{Binding IsSaving}" />
+                                <Image Source="ic_zebra_printer.png" Margin="15,0,0,0" VerticalOptions="Center" HorizontalOptions="End">
+                                    <Image.Triggers>
+                                        <DataTrigger TargetType="Image" Binding="{Binding Source={x:Reference MainContentPage}, Path=BindingContext.IsSavingFormat}" Value="True">
+                                            <Setter Property="Opacity" Value="0.25" />
+                                        </DataTrigger>
+                                    </Image.Triggers>
+                                    <Image.GestureRecognizers>
+                                        <TapGestureRecognizer CommandParameter="{Binding .}" Command="{Binding OnPrintButtonClicked}" />
+                                    </Image.GestureRecognizers>
+                                </Image>
+                            </StackLayout>
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Grid Grid.Row="2" BackgroundColor="White" IsVisible="{Binding IsPrinterFormatListRefreshing}">
+                <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
+                    <ActivityIndicator IsRunning="{Binding IsPrinterFormatListRefreshing}" />
+                    <Label Margin="0,5,0,0" Text="Retrieving printer formats..." Style="{StaticResource ProgressMessageStyle}" />
+                </StackLayout>
+            </Grid>
+            <Label Grid.Row="2" Text="No formats found" Style="{StaticResource EmptyListMessageStyle}" IsVisible="False" HorizontalOptions="Center" VerticalOptions="Center">
+                <Label.Triggers>
+                    <MultiTrigger TargetType="Label">
+                        <MultiTrigger.Conditions>
+                            <BindingCondition Binding="{Binding IsPrinterFormatListRefreshing}" Value="False" />
+                            <BindingCondition Binding="{Binding PrinterFormatList, Converter={StaticResource ListEmptyConverter}}" Value="True" />
+                        </MultiTrigger.Conditions>
+                        <Setter Property="IsVisible" Value="True" />
+                    </MultiTrigger>
+                </Label.Triggers>
+            </Label>
+        </Grid>
+        <Grid Grid.RowSpan="3" BackgroundColor="White" IsVisible="{Binding IsSelectingNfcPrinter}">
+            <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
+                <ActivityIndicator IsRunning="{Binding IsSelectingNfcPrinter}" />
+                <Label Margin="0,5,0,0" Text="Selecting printer through NFC..." Style="{StaticResource ProgressMessageStyle}" />
+            </StackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

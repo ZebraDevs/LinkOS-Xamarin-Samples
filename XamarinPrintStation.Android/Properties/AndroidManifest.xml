@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.zebra.XamarinPrintStation" android:installLocation="auto" android:versionCode="2634" android:versionName="2.15.2634">
+	<uses-sdk android:minSdkVersion="19" />
+	<uses-feature android:name="android.hardware.nfc" android:required="false" />
+	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+	<uses-permission android:name="android.permission.BLUETOOTH" />
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.NFC" />
+	<application android:label="Print Station"></application>
+</manifest>

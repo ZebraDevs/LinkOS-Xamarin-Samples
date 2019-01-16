@@ -1,0 +1,41 @@
+﻿<!--
+ /***********************************************
+ * CONFIDENTIAL AND PROPRIETARY 
+ * 
+ * The source code and other information contained herein is the confidential and exclusive property of
+ * ZIH Corp. and is subject to the terms and conditions in your end user license agreement.
+ * This source code, and any other information contained herein, shall not be copied, reproduced, published, 
+ * displayed or distributed, in whole or in part, in any medium, by any means, for any purpose except as
+ * expressly permitted under such license agreement.
+ * 
+ * Copyright ZIH Corp. 2018
+ * 
+ * ALL RIGHTS RESERVED
+ ***********************************************/
+-->
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:XamarinPrintStation"
+             x:Class="XamarinPrintStation.AboutPage"
+             Title="About"
+             BackgroundColor="White">
+    <ContentPage.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0" Padding="15, 10">
+                <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                    <Image Source="zebra_head.png" HorizontalOptions="Center" />
+                    <Label Margin="0,10,0,0" Text="About Print Station" FontAttributes="Bold" FontSize="Small" />
+                    <Label Text="Version 2.15.2634" FontSize="Micro" />
+                    <!-- This version number will be replaced by a build step in the Build.xml for this solution -->
+                    <Label Margin="0,5,0,0" Text="© 2018 ZIH Corp." TextColor="Gray" FontAttributes="Italic" FontSize="Micro" />
+                </StackLayout>
+            </Grid>
+            <Button Grid.Row="1" Text="Close" Clicked="CloseButton_Clicked" />
+        </Grid>
+    </ContentPage.Content>
+</ContentPage>
