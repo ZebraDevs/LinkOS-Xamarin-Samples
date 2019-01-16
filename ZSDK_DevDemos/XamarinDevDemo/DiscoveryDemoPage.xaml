@@ -1,0 +1,58 @@
+﻿<!--
+ /***********************************************
+ * CONFIDENTIAL AND PROPRIETARY 
+ * 
+ * The source code and other information contained herein is the confidential and exclusive property of
+ * ZIH Corp. and is subject to the terms and conditions in your end user license agreement.
+ * This source code, and any other information contained herein, shall not be copied, reproduced, published, 
+ * displayed or distributed, in whole or in part, in any medium, by any means, for any purpose except as
+ * expressly permitted under such license agreement.
+ * 
+ * Copyright ZIH Corp. 2018
+ * 
+ * ALL RIGHTS RESERVED
+ ***********************************************/
+-->
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="XamarinDevDemo.DiscoveryDemoPage"
+             Title="Discovery Demo">
+    <ContentPage.Content>
+        <StackLayout Padding="15">
+            <Picker x:Name="DiscoveryMethodPicker" SelectedIndexChanged="DiscoveryMethodPicker_SelectedIndexChanged">
+                <Picker.Items>
+                    <x:String>Local Broadcast</x:String>
+                    <x:String>Directed Broadcast</x:String>
+                    <x:String>Multicast Broadcast</x:String>
+                    <x:String>Subnet Search</x:String>
+                    <x:String>Zebra USB Drivers</x:String>
+                    <x:String>USB Direct</x:String>
+                    <x:String>Find Printers Near Me</x:String>
+                    <x:String>Find All Bluetooth Devices</x:String>
+                </Picker.Items>
+            </Picker>
+            <Entry x:Name="IpAddressEntry" Placeholder="IP Address / DNS Name" />
+            <Entry x:Name="NumberOfHopsEntry" Placeholder="Number of Hops" Keyboard="Numeric" />
+            <Entry x:Name="SubnetRangeEntry" Placeholder="Subnet Range" />
+            <Button x:Name="DiscoverPrintersButton" Text="Discover Printers" Margin="0,0,0,15" Clicked="DiscoverPrintersButton_Clicked" />
+            <Label Text="Discovered Printers" />
+            <Grid VerticalOptions="FillAndExpand">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <ListView Grid.Row="0" x:Name="DiscoveredPrintersListView" Margin="0,0,0,5" ItemSelected="DiscoveredPrintersListView_ItemSelected">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <ViewCell>
+                                <Label Text="{Binding Address}" />
+                            </ViewCell>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+                <Editor Grid.Row="1" x:Name="DiscoveredPrinterEditor" Margin="0,5,0,0" />
+            </Grid>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

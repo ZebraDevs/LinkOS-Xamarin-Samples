@@ -1,0 +1,51 @@
+﻿<!--
+ /***********************************************
+ * CONFIDENTIAL AND PROPRIETARY 
+ * 
+ * The source code and other information contained herein is the confidential and exclusive property of
+ * ZIH Corp. and is subject to the terms and conditions in your end user license agreement.
+ * This source code, and any other information contained herein, shall not be copied, reproduced, published, 
+ * displayed or distributed, in whole or in part, in any medium, by any means, for any purpose except as
+ * expressly permitted under such license agreement.
+ * 
+ * Copyright ZIH Corp. 2018
+ * 
+ * ALL RIGHTS RESERVED
+ ***********************************************/
+-->
+
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="XamarinDevDemo.StatusChannelDemoPage"
+             Title="Status Channel Demo">
+    <ContentPage.Content>
+        <StackLayout Padding="15">
+            <Picker x:Name="ConnectionTypePicker" SelectedIndexChanged="ConnectionTypePicker_SelectedIndexChanged">
+                <Picker.Items>
+                    <x:String>Network</x:String>
+                    <x:String>Bluetooth</x:String>
+                </Picker.Items>
+            </Picker>
+            <Entry x:Name="AddressEntry" />
+            <Entry x:Name="StatusPortNumberEntry" Placeholder="Status Port Number" />
+            <Button x:Name="FindAvailableChannelsButton" Text="Find Available Channels" Clicked="FindAvailableChannelsButton_Clicked" />
+            <Button x:Name="GetPrinterStatusButton" Text="Get Printer Status" Clicked="GetPrinterStatusButton_Clicked" Margin="0,0,0,15" />
+            <Grid VerticalOptions="FillAndExpand">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="2*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Text="Printer Status" Font="Bold, Default" />
+                <ScrollView Grid.Row="1">
+                    <Label x:Name="PrinterStatusLabel" />
+                </ScrollView>
+                <Label x:Name="AvailableChannelsHeaderLabel" Grid.Row="2" Text="Available Channels" Font="Bold, Default" />
+                <ScrollView Grid.Row="3">
+                    <Label x:Name="AvailableChannelsLabel" />
+                </ScrollView>
+            </Grid>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

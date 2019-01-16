@@ -3,8 +3,11 @@ C# .NET based sample code for developing printing and encoding apps on Android, 
 
 ## Projects contained in this repository:
 
-[ZSDK DevDemos](https://github.com/Zebra/LinkOS-Xamarin-Samples/tree/ZSDK_DevDemos) 
+Samples to go with the original Xamarin SDK (LinkOS_Xamarin_SDK) [ZSDK DevDemos](https://github.com/Zebra/LinkOS-Xamarin-Samples/tree/ZSDK_DevDemos) 
 
+Samples to go with the 2.15 version of the Xamarin SDK (Zebra.Printer.SDK) [ZSDK DevDemos 2.15](https://github.com/Zebra/LinkOS-Xamarin-Samples/tree/ZSDK_DevDemos_2_15)
+
+A PrintStation Example to go with the 2.15 version of the Xamarin SDK (Zebra.Printer.SDK) [PrintStation 2.15](https://github.com/Zebra/LinkOS-Xamarin-Samples/tree/PrintStation_2_15)
 
 # Notes
 All printer sample code is selectable from the branches on this repository.
